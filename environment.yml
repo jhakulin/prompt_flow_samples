@@ -1,0 +1,22 @@
+name: designer
+channels:
+  - anaconda
+  - pytorch
+  - conda-forge
+dependencies:
+  - python==3.10.4
+  - pip==23.2.1
+  - pip:
+    - openai
+    - azure-identity
+    - azure-ai-ml
+    - promptflow
+    - promptflow-tools
+    - langchain
+    - unstructured[all-docs]
+    - azure-search-documents
+    - pytest
+    - jinja2
+    - chainlit
+    - tiktoken
+    - chainlit
