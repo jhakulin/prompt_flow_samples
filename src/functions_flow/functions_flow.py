@@ -163,7 +163,14 @@ async def run_conversation(chat_history, question):
     )
 
     messages = [{"role": "system", 
-                 "content": "You are a helpful assistant that help the user with the help of some functions."}]
+                 "content": """
+                 You are a helpful assistant that helps the user with the help of some functions.
+                 If you are using multiple tools to solve a user's task, make sure to communicate 
+                 information learned from one tool to the next tool.
+                 For instance, if the user ask to draw a picture of the current weather in NYC,
+                 you can use the weather API to get the current weather in NYC and then pass that information
+                 to the image generation tool.   
+                 """}]
     for turn in chat_history:
         messages.append({"role": "user", "content": turn["inputs"]["question"]})
         messages.append({"role": "assistant", "content": turn["outputs"]["answer"]})  
