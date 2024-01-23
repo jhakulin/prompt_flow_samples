@@ -13,9 +13,6 @@ import promptflow as pf
 @cl.on_chat_start
 def start_chat():
     print("starting chat")
-    # image_dir = os.path.join(os.curdir, 'images')
-    # if not os.path.isdir(image_dir):
-    #     os.mkdir(image_dir)
 
     cl.user_session.set(
         "chat_history",
@@ -62,15 +59,5 @@ async def run_conversation(message: cl.Message):
                          "outputs": {"answer": response["answer"]}})
 
 if __name__ == "__main__":
-    # import phoenix as px
-    # session = px.launch_app(port=5000)
-
-    # from phoenix.trace.exporter import HttpExporter
-    # from phoenix.trace.openai.instrumentor import OpenAIInstrumentor
-    # from phoenix.trace.tracer import Tracer
-
-    # tracer = Tracer(exporter=HttpExporter())
-    # OpenAIInstrumentor(tracer).instrument()
-
     from chainlit.cli import run_chainlit
     run_chainlit(__file__)
