@@ -31,20 +31,23 @@ def show_images(base64_image):
     ]
     return elements
 
+@cl.step(type="llm")
+async def call_promptflow(chat_history, message):
+    prompt_flow = os.path.join(os.path.dirname(__file__), 'functions_flow')
+    client = pf.PFClient()
+ 
+    response = await cl.make_async(client.test)(prompt_flow, 
+                                                  inputs={"chat_history": chat_history,
+                                                          "question": message.content})
+    return response
+
 
 @cl.on_message
 async def run_conversation(message: cl.Message):
     print("running conversation")
     chat_history = cl.user_session.get("chat_history")
-
-    prompt_flow = os.path.join(os.path.dirname(__file__), 'functions_flow')
-
-    client = pf.PFClient()
-    test_function = client.test
  
-    response = await cl.make_async(test_function)(prompt_flow, 
-                                                  inputs={"chat_history": chat_history,
-                                                          "question": message.content})
+    response = await call_promptflow(chat_history, message)
 
     if response["image"]:
         elements = show_images(response["image"])
