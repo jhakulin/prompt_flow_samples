@@ -13,6 +13,7 @@ dependencies:
     - promptflow
     - promptflow-tools
     - langchain
+    - langchain-openai
     - unstructured[all-docs]
     - azure-search-documents
     - pytest
@@ -20,3 +21,9 @@ dependencies:
     - chainlit
     - tiktoken
     - chainlit
+    - python-frontmatter
+    - ipykernel
+    - ipython
+    - arize-phoenix[experimental]
+    - pandas 
+    - numpy
