@@ -16,7 +16,7 @@ outputs:
     reference: ${functions.output.answer}
     is_chat_output: true
   image:
-    type: string
+    type: object
     reference: ${functions.output.image}
 nodes:
 - name: functions
