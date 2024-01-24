@@ -19,9 +19,25 @@ def start_chat():
         [],
     )
 
+    cl.user_session.set(
+        "prompt_flow",
+        os.path.join(os.path.dirname(__file__), 'functions_flow'),
+    )
 
-def show_images(base64_image):
-    decoded_image = base64.b64decode(base64_image)
+def show_images(image):
+    # image is a dict of length 1
+    # key is the type of image, value is the base64 encoded image or file path, depending on the type
+
+    image_type = list(image.keys())[0]
+    image_content = list(image.values())[0]
+    if image_type.endswith(";base64"):
+        decoded_image = base64.b64decode(image_content)
+    elif image_type.endswith(";path"):
+        prompt_flow = cl.user_session.get("prompt_flow")
+        decoded_image = open(os.path.join(prompt_flow, image_content), "rb").read()
+    else:
+        raise Exception("Unknown image type: " + image_type)
+
     elements = [
         cl.Image(
             content=decoded_image,
@@ -33,7 +49,7 @@ def show_images(base64_image):
 
 @cl.step(type="llm")
 async def call_promptflow(chat_history, message):
-    prompt_flow = os.path.join(os.path.dirname(__file__), 'functions_flow')
+    prompt_flow = cl.user_session.get("prompt_flow")
     client = pf.PFClient()
  
     response = await cl.make_async(client.test)(prompt_flow, 

@@ -5,6 +5,7 @@ import requests
 from openai import AsyncAzureOpenAI
 from urllib.parse import quote
 from promptflow import tool
+from promptflow.contracts.multimedia import Image
 import asyncio
 import base64
 
@@ -12,7 +13,7 @@ MAX_ITER = 5
 global client
 
 import json
-import base64
+
 
 def get_current_weather(location):
     """Get the current weather in a given location"""
@@ -56,7 +57,8 @@ async def create_a_picture(prompt):
     print(image_url)
     generated_image = requests.get(image_url).content  # download the image
     # base64 encode generated_image
-    return base64.b64encode(generated_image).decode("utf-8")
+    # return base64.b64encode(generated_image).decode("utf-8")
+    return generated_image
 
 tools = [
     {
@@ -185,7 +187,7 @@ async def run_conversation(chat_history, question):
         message = messages[-1]
         if get(message,'role')=="tool":
             if get(message,'name')=="create_a_picture": 
-                image = message['content']
+                image = Image(value=message['content'])
                 message['content'] = "Attached is the picture you asked for."
         else:
             return dict(
