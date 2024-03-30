@@ -8,8 +8,9 @@ from urllib.parse import quote
 from chainlit.playground.providers.openai import stringify_function_call
 import chainlit as cl
 import base64
-import promptflow as pf
-
+from promptflow.client import PFClient
+from promptflow.tracing import start_trace
+start_trace()
 
 @cl.on_chat_start
 def start_chat():
@@ -58,7 +59,7 @@ def show_images(image):
 @cl.step(type="llm")
 async def call_promptflow(chat_history, message):
     prompt_flow = cl.user_session.get("config")["active_promptflow"]
-    client = pf.PFClient()
+    client = PFClient()
  
     response = await cl.make_async(client.test)(prompt_flow, 
                                                   inputs={"chat_history": chat_history,
@@ -107,15 +108,9 @@ async def run_conversation(message: cl.Message):
                             "outputs": {"answer": response["answer"]}})
 
 if __name__ == "__main__":
-
-    # import phoenix as px
-    # from phoenix.trace.exporter import HttpExporter
-    # from phoenix.trace.openai.instrumentor import OpenAIInstrumentor
-    # from phoenix.trace.tracer import Tracer
-
-    # # session = px.launch_app()
     # tracer = Tracer(exporter=HttpExporter(port=6006))
     # OpenAIInstrumentor(tracer).instrument()
+
 
     from chainlit.cli import run_chainlit
     run_chainlit(__file__)

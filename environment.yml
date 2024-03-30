@@ -10,7 +10,7 @@ dependencies:
     - openai
     - azure-identity
     - azure-ai-ml
-    - promptflow
+    - promptflow>=1.7.0
     - promptflow-tools
     - langchain
     - langchain-openai
@@ -24,6 +24,5 @@ dependencies:
     - python-frontmatter
     - ipykernel
     - ipython
-    - arize-phoenix[experimental]
     - pandas 
     - numpy
