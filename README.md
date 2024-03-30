@@ -12,6 +12,8 @@ In this sample, we will show how to trace OpenAI Function calling using promptfl
     - deployment of `gpt-35-turbo-1106` (**OPENAI_CHAT_MODEL**) or another model that supports functions
     - deployment of `dalle3` (**OPENAI_DALLE_MODEL**) 
 
+Copy `.env.sample` to `.env` and fill in the values:
+
 ```bash
 OPENAI_API_TYPE="azure"
 OPENAI_API_VERSION="2023-12-01-preview"
