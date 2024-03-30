@@ -131,7 +131,7 @@ async def call_tool(tool_call, message_history):
 async def call_llm(message_history):
     print("calling llm", message_history)
     settings = {
-        "model": os.getenv("OPENAI_CHAT_MODEL_CHEAP"),
+        "model": os.getenv("OPENAI_CHAT_MODEL"),
         "tools": tools,
         "tool_choice": "auto",
     }
@@ -202,6 +202,8 @@ async def run_conversation(chat_history, question):
 
 
 if __name__ == "__main__":
+    from promptflow.tracing import start_trace
+    start_trace()
     chat_history = [dict(inputs={"question": "What is the weather like in New York?"},
                          outputs={"answer": "It is sunny in New York today."})]
 

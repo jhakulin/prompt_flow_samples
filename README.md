@@ -6,16 +6,11 @@ In this sample, we will show how to trace OpenAI Function calling using promptfl
 
 - Python 3.10
 - Conda
-- weatherAPI key (sign up for free account: https://www.weatherapi.com/ that will give you 1 Mio requests per month)
-- OpenAI API key for resouce with 
-    - deployment of `gpt-35-turbo-1106` or another model that supports functions
-    - deployment of `dalle3`
-
-Copy the `.env.sample` file to `.env` and fill in the required values.
-
-```bash
-cp .env.sample .env
-```
+- weatherAPI key (**WEATHER_API_KEY**). Sign up for the free account at https://www.weatherapi.com/ -- that will give you 1 Mio requests per month
+- OpenAI API resouce (**OPENAI_API_BASE**, **OPENAI_API_KEY**) -- I recommend creating it in Sweden central. 
+- Deployments of OpenAI models:
+    - deployment of `gpt-35-turbo-1106` (**OPENAI_CHAT_MODEL**) or another model that supports functions
+    - deployment of `dalle3` (**OPENAI_DALLE_MODEL**) 
 
 ```bash
 OPENAI_API_TYPE="azure"
@@ -23,9 +18,7 @@ OPENAI_API_VERSION="2023-12-01-preview"
 OPENAI_API_BASE=https://***.openai.azure.com/
 OPENAI_API_KEY=***
 OPENAI_CHAT_MODEL=gpt-4-1106-preview
-OPENAI_CHAT_MODEL_CHEAP=gpt-35-turbo-1106
 OPENAI_DALLE_MODEL=dalle3
-OPENAI_EMBEDDING_MODEL=text-embedding-ada-002
 WEATHER_API_KEY=***
 WEATHER_API_BASE="http://api.weatherapi.com/v1/current.json?"
 ```
