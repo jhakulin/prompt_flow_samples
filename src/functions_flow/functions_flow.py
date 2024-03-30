@@ -4,8 +4,9 @@ import inspect
 import requests
 from openai import AsyncAzureOpenAI
 from urllib.parse import quote
-from promptflow import tool
+from promptflow.core import tool
 from promptflow.contracts.multimedia import Image
+from promptflow.tracing import trace
 import asyncio
 import base64
 
@@ -15,8 +16,10 @@ global client
 import json
 
 
+@trace
 def get_current_weather(location):
     """Get the current weather in a given location"""
+    print(f"getting current weather in {location}")
     api_key = os.getenv("WEATHER_API_KEY")
     base_url = os.getenv("WEATHER_API_BASE")
 
@@ -34,7 +37,7 @@ def get_current_weather(location):
     else:
         raise Exception("An error occurred while fetching data: " + weather_data)
 
-
+@trace
 async def create_a_picture(prompt):
     """
     Creates a picture based on a description given by the user and returns the picture data as base64 encoded string. 
@@ -101,7 +104,7 @@ tools = [
     }
 ]
 
-
+@trace
 async def call_tool(tool_call, message_history):
     available_functions = {
         "get_current_weather": get_current_weather,
