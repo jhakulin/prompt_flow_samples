@@ -6,7 +6,7 @@ In this sample, we will show how to trace OpenAI Function calling using promptfl
 
 - Python 3.10
 - Conda
-- weatherAPI key (sign up for free base account: https://www.weatherapi.com/)
+- weatherAPI key (sign up for free account: https://www.weatherapi.com/ that will give you 1 Mio requests per month)
 - OpenAI API key for resouce with 
     - deployment of `gpt-35-turbo-1106` or another model that supports functions
     - deployment of `dalle3`
@@ -36,6 +36,16 @@ WEATHER_API_BASE="http://api.weatherapi.com/v1/current.json?"
 conda env create -f environment.yml
 conda activate designer
 ```
+
+### Turn on experimental promptflow features
+
+To enable tracing, you need to turn on the internal features of promptflow. This can be done by setting the `enable_internal_features` to `true` in the promptflow configuration.
+
+```bash
+pf config set enable_internal_features=true
+```
+(see [here](https://github.com/microsoft/promptflow/blob/clwan/eager-mode-sample/examples/tutorials/trace/README.md) for more information)
+
 
 ### Run the sample
 
