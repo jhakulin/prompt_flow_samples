@@ -41,15 +41,33 @@ pf config set enable_internal_features=true
 ```
 (see [here](https://github.com/microsoft/promptflow/blob/clwan/eager-mode-sample/examples/tutorials/trace/README.md) for more information)
 
+### Optional: Start the `pfs` service
+
+The `pfs` service is a local service that is used to log and visualize the traces. It will start automatically when you run `start_trace()` in the code. If you want to start it manually, you can do so by running:
+
+```bash
+pfs start
+```
+
+Should yield output similar to this -- your port can differ:
+```bash
+(designer) danielsc@Daniels-MBP-M1 git % pfs start
+INFO:waitress:Serving on http://127.0.0.1:61802
+Start Prompt Flow Service on 61802, version: 1.7.0
+```
+
+You can the view the traces UI at (make sure to change to reflect your port): http://localhost:61802/v1.0/ui/traces/
 
 ### Run the sample
+
+The sample app uses [chainlit](https://docs.chainlit.io/get-started/overview) to build a simple chat UI that is capable of displaying images. The app is started like so:
 
 ```bash
 cd src
 chainlit run app.py
 ```
 
-The output will be similar to this (port numbers might differ):
+The console output will be similar to this (port numbers might differ):
 
 ```bash
 INFO:waitress:Serving on http://127.0.0.1:61802
