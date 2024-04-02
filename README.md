@@ -32,6 +32,12 @@ conda env create -f environment.yml
 conda activate designer
 ```
 
+Alternatively, you can install the dependencies with pip -- make sure your python environment is python 3.10 or above:
+
+```bash
+pip install -r requirements.txt
+```
+
 ### Turn on experimental promptflow features
 
 To enable tracing, you need to turn on the internal features of promptflow. This can be done by setting the `enable_internal_features` to `true` in the promptflow configuration.
