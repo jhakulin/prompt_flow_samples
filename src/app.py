@@ -10,7 +10,11 @@ import chainlit as cl
 import base64
 from promptflow.client import PFClient
 from promptflow.tracing import start_trace
+from dotenv import load_dotenv
+load_dotenv()
+
 start_trace()
+
 
 @cl.on_chat_start
 def start_chat():
