@@ -10,7 +10,7 @@ from promptflow.tracing import trace
 import asyncio
 import base64
 
-MAX_ITER = 5
+MAX_ITER = 20
 global client
 
 import json
@@ -199,6 +199,8 @@ async def run_conversation(chat_history, question):
             )
 
         cur_iter += 1
+    
+    return dict(answer="exceeded max iterations", image=None)
 
 
 if __name__ == "__main__":
