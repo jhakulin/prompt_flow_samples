@@ -127,7 +127,7 @@ async def call_tool(tool_call, message_history):
         }
     )  # extend conversation with function response
 
-
+@trace
 async def call_llm(message_history):
     print("calling llm", message_history)
     settings = {
@@ -172,16 +172,21 @@ async def run_conversation(chat_history, question):
                  You are a helpful assistant that helps the user with the help of some functions.
                  If you are using multiple tools to solve a user's task, make sure to communicate 
                  information learned from one tool to the next tool.
-                 For instance, if the user ask to draw a picture of the current weather in NYC,
-                 you can use the weather API to get the current weather in NYC and then pass that information
-                 to the image generation tool.   
+                 First, make a plan of how you will use the tools to solve the user's task and communicated
+                 that plan to the user with the first response. Then execute the plan making sure to communicate
+                 the required information between tools since tools only see the information passed to them;
+                 They do not have access to the chat history.
+                 If you think that tool use can be parallelized (e.g. to get weather data for multiple cities) 
+                 make sure to use the multi_tool_use.parallel function to execute.
                  """}]
+
     for turn in chat_history:
         messages.append({"role": "user", "content": turn["inputs"]["question"]})
         messages.append({"role": "assistant", "content": turn["outputs"]["answer"]})  
     
     messages.append({"role": "user", "content": question})
     image = None
+    length_of_chat = len(messages)
 
     cur_iter = 0
 
@@ -193,8 +198,13 @@ async def run_conversation(chat_history, question):
                 image = Image(value=message['content'])
                 message['content'] = "Attached is the picture you asked for."
         else:
+            answer = ""
+            for past_message in messages[length_of_chat:]:
+                if hasattr(past_message,"content") and past_message.content:
+                    answer += past_message.content + "\n\n---\n"
+
             return dict(
-                answer=message.content,
+                answer=answer,
                 image=image
             )
 
