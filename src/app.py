@@ -99,6 +99,11 @@ async def run_conversation(message: cl.Message):
     else:
         response = await call_promptflow(chat_history, message)
 
+        if "messages" in response:
+            for thing in response["messages"]:
+                async with cl.Step(name=thing["role"]) as child_step:
+                    child_step.output = thing["content"]
+
         if response["image"]:
             elements = show_images(response["image"])
         else:
@@ -112,9 +117,8 @@ async def run_conversation(message: cl.Message):
                             "outputs": {"answer": response["answer"]}})
 
 if __name__ == "__main__":
-    # tracer = Tracer(exporter=HttpExporter(port=6006))
-    # OpenAIInstrumentor(tracer).instrument()
 
+    print("using the follwoing chat_model", os.getenv("OPENAI_CHAT_MODEL"))
 
     from chainlit.cli import run_chainlit
     run_chainlit(__file__)

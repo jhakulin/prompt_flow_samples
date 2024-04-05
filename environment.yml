@@ -26,3 +26,4 @@ dependencies:
     - ipython
     - pandas 
     - numpy
+    - pyautogen
