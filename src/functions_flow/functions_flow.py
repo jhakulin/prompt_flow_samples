@@ -35,7 +35,7 @@ def get_current_weather(location):
         return json.dumps(weather_data['current'])
 
     else:
-        raise Exception("An error occurred while fetching data: " + weather_data)
+        raise Exception("An error occurred while fetching data: " + str(weather_data))
 
 @trace
 async def create_a_picture(prompt):
@@ -166,6 +166,16 @@ async def run_conversation(chat_history, question):
         azure_endpoint = os.getenv("OPENAI_API_BASE"),
         api_version = os.getenv("OPENAI_API_VERSION")
     )
+
+    # messages = [{"role": "system", 
+    #              "content": """
+    #              You are a helpful assistant that helps the user with the help of some functions.
+    #              If you are using multiple tools to solve a user's task, make sure to communicate 
+    #              information learned from one tool to the next tool.
+    #              For instance, if the user ask to draw a picture of the current weather in NYC,
+    #              you can use the weather API to get the current weather in NYC and then pass that information
+    #              to the image generation tool.   
+    #              """}]
 
     messages = [{"role": "system", 
                  "content": """
