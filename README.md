@@ -9,7 +9,7 @@ In this sample, we will show how to trace OpenAI Function calling using promptfl
 - weatherAPI key (**WEATHER_API_KEY**). Sign up for the free account at https://www.weatherapi.com/ -- that will give you 1 Mio requests per month
 - OpenAI API resouce (**OPENAI_API_BASE**, **OPENAI_API_KEY**) -- I recommend creating it in Sweden central. 
 - Deployments of OpenAI models:
-    - deployment of `gpt-35-turbo-1106` (**OPENAI_CHAT_MODEL**) or another model that supports functions
+    - deployment of `gpt-4-1106-preview` (**OPENAI_CHAT_MODEL**) or another model that supports functions -- `gpt-35-turbo-1106` works but you will quickly notice how gpt-4 is far better at reasoning....
     - deployment of `dalle3` (**OPENAI_DALLE_MODEL**) 
 
 Copy `.env.sample` to `.env` and fill in the values:
