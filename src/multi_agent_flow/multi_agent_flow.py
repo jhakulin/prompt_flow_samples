@@ -58,7 +58,10 @@ class MultiAgentOrchestrator(AsyncTaskManagerCallbacks, AsyncAssistantClientCall
 
     @trace
     async def on_run_start(self, assistant_name, run_identifier, run_start_time, user_input):
-        print(f"\n{assistant_name} started processing input: {user_input}")
+        if assistant_name == "CodeProgrammerAgent" or assistant_name == "CodeInspectionAgent":
+            print(f"\n{assistant_name}: starting the task with input: {user_input}")
+        elif assistant_name == "FileCreatorAgent":
+            print(f"\n{assistant_name}: analyzing the CodeProgrammerAgent output for file creation")
 
     async def on_run_update(self, assistant_name, run_identifier, run_status, thread_name, is_first_message=False, message=None):
         if run_status == "in_progress" and is_first_message:
@@ -72,9 +75,12 @@ class MultiAgentOrchestrator(AsyncTaskManagerCallbacks, AsyncAssistantClientCall
             print(f"{assistant_name}: {response}")
         else:
             conversation = await self.conversation_thread_client.retrieve_conversation(thread_name)
-            output = conversation.get_last_text_message(assistant_name)
-            self.messages.append(output.content)
-            print(f"\n{output}")
+            message = conversation.get_last_text_message(assistant_name)
+            self.messages.append(message.content)
+            print(f"\n{message}")
+            if assistant_name == "CodeProgrammerAgent":
+                # Extract the JSON code block from the response by using the FileCreatorAgent
+                await self._assistants["FileCreatorAgent"].process_messages(user_request=message.content)
 
     @trace
     async def on_function_call_processed(self, assistant_name, run_identifier, function_name, arguments, response = None):
@@ -121,7 +127,7 @@ async def initialize_assistants(assistant_names: List[str], orchestrator: MultiA
     for assistant_name in assistant_names:
         config = load_assistant_config(assistant_name)
         if config:
-            if assistant_name == "TaskPlannerAgent":
+            if assistant_name == "TaskPlannerAgent" or assistant_name == "FileCreatorAgent":
                 assistants[assistant_name] = await AsyncChatAssistantClient.from_yaml(config, callbacks=orchestrator)
             else:
                 assistants[assistant_name] = await AsyncAssistantClient.from_yaml(config, callbacks=orchestrator)
@@ -149,7 +155,7 @@ def contains_plan(text):
 
 @tool
 async def run_multi_agents(chat_history : list, user_request : str):
-    assistant_names = ["CodeProgrammerAgent", "CodeInspectionAgent", "TaskPlannerAgent"]
+    assistant_names = ["CodeProgrammerAgent", "CodeInspectionAgent", "TaskPlannerAgent", "FileCreatorAgent"]
     messages = []
     orchestrator = MultiAgentOrchestrator(messages=messages)
     assistants = await initialize_assistants(assistant_names, orchestrator)

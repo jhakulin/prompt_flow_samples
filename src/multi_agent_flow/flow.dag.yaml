@@ -9,8 +9,7 @@ inputs:
   user_request:
     type: string
     is_chat_input: true
-    default: Please create basic chat CLI application using python between user and
-      assistant
+    default: Please create tic-toc game using java as programming language
 outputs:
   result:
     type: list
