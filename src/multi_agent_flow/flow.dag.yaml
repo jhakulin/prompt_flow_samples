@@ -1,0 +1,27 @@
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
+environment:
+  python_requirements_txt: requirements.txt
+inputs:
+  chat_history:
+    type: list
+    is_chat_history: true
+    default: []
+  user_request:
+    type: string
+    is_chat_input: true
+    default: Please create basic chat CLI application using python between user and
+      assistant
+outputs:
+  result:
+    type: list
+    reference: ${multi_agents.output.result}
+    is_chat_output: true
+nodes:
+- name: multi_agents
+  type: python
+  source:
+    type: code
+    path: multi_agent_flow.py
+  inputs:
+    chat_history: ${inputs.chat_history}
+    user_request: ${inputs.user_request}
