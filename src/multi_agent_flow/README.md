@@ -65,7 +65,6 @@ Bot: To create a basic CLI (Command Line Interface) application for chat between
 
 Here's a plan to coordinate the assistants to complete this task:
 
-```json
 [
     {
         "assistant": "CodeProgrammerAgent",
@@ -80,7 +79,6 @@ Here's a plan to coordinate the assistants to complete this task:
         "task": "Implement the feedback provided by the CodeInspectionAgent to ensure the C++ CLI chat application is of high quality, adheres to best practices, and is well-documented. Compile and test the application to ensure it works as expected."
     }
 ]
-```
 
 Before proceeding with this plan, we need to confirm with the user:
 
