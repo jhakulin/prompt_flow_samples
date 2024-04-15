@@ -58,10 +58,10 @@ class MultiAgentOrchestrator(AsyncTaskManagerCallbacks, AsyncAssistantClientCall
 
     @trace
     async def on_run_start(self, assistant_name, run_identifier, run_start_time, user_input):
-        if assistant_name == "CodeProgrammerAgent" or assistant_name == "CodeInspectionAgent":
+        if self._assistants[assistant_name].assistant_config.assistant_role == "engineer":
             print(f"\n{assistant_name}: starting the task with input: {user_input}")
-        elif assistant_name == "FileCreatorAgent":
-            print(f"\n{assistant_name}: analyzing the CodeProgrammerAgent output for file creation")
+        elif self._assistants[assistant_name].assistant_config.assistant_role != "user_interaction":
+            print(f"\n{assistant_name}: starting the task")
 
     async def on_run_update(self, assistant_name, run_identifier, run_status, thread_name, is_first_message=False, message=None):
         if run_status == "in_progress" and is_first_message:
@@ -128,7 +128,7 @@ async def initialize_assistants(assistant_names: List[str], orchestrator: MultiA
         config = load_assistant_config(assistant_name)
         if config:
             if assistant_name == "TaskPlannerAgent" or assistant_name == "FileCreatorAgent":
-                assistants[assistant_name] = await AsyncChatAssistantClient.from_yaml(config, callbacks=orchestrator)
+                assistants[assistant_name] = await AsyncChatAssistantClient.from_yaml(config)
             else:
                 assistants[assistant_name] = await AsyncAssistantClient.from_yaml(config, callbacks=orchestrator)
     orchestrator.assistants = assistants
@@ -145,12 +145,17 @@ def extract_json_code_block(text):
     return match.group(1) if match else text
 
 
-def contains_plan(text):
+def requires_user_confirmation(assistant_response: str):
     """
-    Checks if the text contains the word "plan" (case-insensitive).
+    Checks if the response requires user confirmation.
+
+    NOTE: This is a very simple implementation and may not cover all cases.
+    Could be improved e.g. by using a ML model to detect the intent from the response and context.
     """
-    # if the text contains json code block, return True, otherwise return False
-    return "```json" in text
+    # Remove text under json code block
+    assistant_response = re.sub(r"```json\n([\s\S]*?)\n```", "", assistant_response)
+    # if text contains question mark, return True
+    return "?" in assistant_response
 
 
 @tool
@@ -172,12 +177,14 @@ async def run_multi_agents(chat_history : list, user_request : str):
         conversation = await conversation_thread_client.retrieve_conversation(planner_thread)
         response = conversation.get_last_text_message("TaskPlannerAgent")
 
-        if contains_plan(response.content):
-            tasks = json.loads(extract_json_code_block(response.content))
+        chat_history.append({"inputs": {"user_request": user_request},
+                            "outputs": {"result": response.content}})
+        if requires_user_confirmation(response.content):
+            return dict(result=response.content)
         else:
-            return dict(result=[response.content])
+            tasks = json.loads(extract_json_code_block(response.content))
     except json.JSONDecodeError:
-        return dict(result=["Error parsing task scheduling response."])
+        return dict(result="Error parsing task scheduling response.")
 
     multi_task = AsyncMultiTask(tasks)
     await task_manager.schedule_task(multi_task)

@@ -12,7 +12,7 @@ inputs:
     default: Please create tic-toc game using java as programming language
 outputs:
   result:
-    type: list
+    type: string
     reference: ${multi_agents.output.result}
     is_chat_output: true
 nodes:
