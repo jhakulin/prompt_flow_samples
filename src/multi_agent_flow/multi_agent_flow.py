@@ -169,6 +169,11 @@ async def run_multi_agents(chat_history : list, user_request : str):
     conversation_thread_client = AsyncConversationThreadClient.get_instance(AsyncAIClientType.AZURE_OPEN_AI)
     planner_thread = await conversation_thread_client.create_conversation_thread()
 
+    # Store the chat history in the conversation thread
+    for message in chat_history:
+        await conversation_thread_client.create_conversation_thread_message(message["inputs"]["user_request"], planner_thread)
+        await conversation_thread_client.create_conversation_thread_message(message["outputs"]["result"], planner_thread, metadata={"chat_assistant": "TaskPlannerAgent"})
+
     await conversation_thread_client.create_conversation_thread_message(user_request, planner_thread)
     await assistants["TaskPlannerAgent"].process_messages(thread_name=planner_thread)
 
