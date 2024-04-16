@@ -1,5 +1,6 @@
 from promptflow.core import tool
 from promptflow.tracing import trace
+import chainlit as cl
 from azure.ai.assistant.management.async_assistant_client import AsyncAssistantClient
 from azure.ai.assistant.management.async_chat_assistant_client import AsyncChatAssistantClient
 from azure.ai.assistant.management.async_assistant_client_callbacks import AsyncAssistantClientCallbacks
@@ -7,6 +8,7 @@ from azure.ai.assistant.management.ai_client_factory import AsyncAIClientType
 from azure.ai.assistant.management.async_conversation_thread_client import AsyncConversationThreadClient
 from azure.ai.assistant.management.async_task_manager import AsyncTaskManager, AsyncMultiTask
 from azure.ai.assistant.management.async_task_manager_callbacks import AsyncTaskManagerCallbacks
+from azure.ai.assistant.management.message import TextMessage
 
 from typing import Dict, List
 import json, re
@@ -69,6 +71,10 @@ class MultiAgentOrchestrator(AsyncTaskManagerCallbacks, AsyncAssistantClientCall
         elif run_status == "in_progress":
             print(".", end="", flush=True)
 
+    @cl.step
+    def assistant_response(self, message : TextMessage) -> str:
+        return message.content
+
     @trace
     async def on_run_end(self, assistant_name, run_identifier, run_end_time, thread_name, response=None):
         if response:
@@ -84,6 +90,8 @@ class MultiAgentOrchestrator(AsyncTaskManagerCallbacks, AsyncAssistantClientCall
                 "message_content": message.content
             })
             
+            self.assistant_response(message)
+
             # Print the whole message
             print(f"\n{assistant_name}: {message.content}")
 

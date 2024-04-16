@@ -6,7 +6,27 @@ for the required SW coding tasks.
 
 ## Prerequisites
 
-Install `azure_ai_assistant-0.2.12a1-py3-none-any.whl` library from https://github.com/Azure-Samples/azureai-assistant-tool/releases/tag/v0.2.12-alpha.
+### Install Latest PromtFlow
+https://microsoft.github.io/promptflow/how-to-guides/faq.html#promptflow-1-8-0-upgrade-guide
+
+```
+pip uninstall -y promptflow promptflow-core promptflow-devkit promptflow-azure # uninstall promptflow and its sub-packages
+pip install 'promptflow>=1.8.0' # install promptflow version 1.8.0 or later
+```
+
+### Install Chainlit
+
+```
+pip install chainlit
+```
+
+### Install Azure AI Assistant library
+
+Copy `azure_ai_assistant-0.2.12a1-py3-none-any.whl` library from https://github.com/Azure-Samples/azureai-assistant-tool/releases/tag/v0.2.12-alpha.
+
+```
+pip install --force-reinstall azure_ai_assistant-0.2.12a1-py3-none-any.whl
+```
 
 ## Configure the sample
 
@@ -28,8 +48,13 @@ Sample consists of following agents and their roles:
 ### Configure the Agents
 
 TaskPlannerAgent get the details about CodeProgrammerAgent and CodeInspectionAgent by file references in the yaml configuration.
-NOTE: Check the file references paths are configured correctly for your environment, the file_references field in yaml config files 
-require absolute path.
+NOTE: Check the file references paths are configured correctly for your environment in `src\multi_agent_flow\config` directory, 
+the file_references field in yaml config files require absolute path.
 - IMPORTANT: If you are not seeing `CodeProgrammerAgent` or `CodeInspectionAgent` in the task list assistant provided, then it means your file
 references are not correct in TaskPlannerAgent yaml configuration.
 
+### Run the Sample
+
+```
+chainlit run app.py
+```
