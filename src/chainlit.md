@@ -6,7 +6,7 @@ for the required SW coding tasks.
 
 ## Prerequisites
 
-### Install Latest PromtFlow
+### Install Latest PromptFlow
 https://microsoft.github.io/promptflow/how-to-guides/faq.html#promptflow-1-8-0-upgrade-guide
 
 ```
