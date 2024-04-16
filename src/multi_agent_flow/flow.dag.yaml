@@ -6,15 +6,18 @@ inputs:
     type: list
     is_chat_history: true
     default: []
-  user_request:
+  question:
     type: string
     is_chat_input: true
     default: Please create tic-toc game using java as programming language
 outputs:
-  result:
+  answer:
     type: string
-    reference: ${multi_agents.output.result}
+    reference: ${multi_agents.output.answer}
     is_chat_output: true
+  messages:
+    type: object
+    reference: ${multi_agents.output.messages}
 nodes:
 - name: multi_agents
   type: python
@@ -23,4 +26,4 @@ nodes:
     path: multi_agent_flow.py
   inputs:
     chat_history: ${inputs.chat_history}
-    user_request: ${inputs.user_request}
+    question: ${inputs.question}

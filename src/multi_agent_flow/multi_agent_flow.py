@@ -74,12 +74,22 @@ class MultiAgentOrchestrator(AsyncTaskManagerCallbacks, AsyncAssistantClientCall
         if response:
             print(f"{assistant_name}: {response}")
         else:
+            # Retrieve the conversation thread if there is no direct response
             conversation = await self.conversation_thread_client.retrieve_conversation(thread_name)
             message = conversation.get_last_text_message(assistant_name)
-            self.messages.append(message.content)
-            print(f"\n{message}")
+            
+            # Append the message as a dictionary with assistant_name and message.content
+            self.messages.append({
+                "assistant_name": assistant_name,
+                "message_content": message.content
+            })
+            
+            # Print the whole message
+            print(f"\n{assistant_name}: {message.content}")
+
+            # If specific logic is needed for CodeProgrammerAgent
             if assistant_name == "CodeProgrammerAgent":
-                # Extract the JSON code block from the response by using the FileCreatorAgent
+                # Extract the JSON code block from the response using FileCreatorAgent
                 await self._assistants["FileCreatorAgent"].process_messages(user_request=message.content)
 
     @trace
@@ -159,7 +169,7 @@ def requires_user_confirmation(assistant_response: str):
 
 
 @tool
-async def run_multi_agents(chat_history : list, user_request : str):
+async def run_multi_agents(chat_history : list, question : str):
     assistant_names = ["CodeProgrammerAgent", "CodeInspectionAgent", "TaskPlannerAgent", "FileCreatorAgent"]
     messages = []
     orchestrator = MultiAgentOrchestrator(messages=messages)
@@ -171,10 +181,10 @@ async def run_multi_agents(chat_history : list, user_request : str):
 
     # Store the chat history in the conversation thread
     for message in chat_history:
-        await conversation_thread_client.create_conversation_thread_message(message["inputs"]["user_request"], planner_thread)
-        await conversation_thread_client.create_conversation_thread_message(message["outputs"]["result"], planner_thread, metadata={"chat_assistant": "TaskPlannerAgent"})
+        await conversation_thread_client.create_conversation_thread_message(message["inputs"]["question"], planner_thread)
+        await conversation_thread_client.create_conversation_thread_message(message["outputs"]["answer"], planner_thread, metadata={"chat_assistant": "TaskPlannerAgent"})
 
-    await conversation_thread_client.create_conversation_thread_message(user_request, planner_thread)
+    await conversation_thread_client.create_conversation_thread_message(question, planner_thread)
     await assistants["TaskPlannerAgent"].process_messages(thread_name=planner_thread)
 
     try:
@@ -182,26 +192,28 @@ async def run_multi_agents(chat_history : list, user_request : str):
         conversation = await conversation_thread_client.retrieve_conversation(planner_thread)
         response = conversation.get_last_text_message("TaskPlannerAgent")
 
-        chat_history.append({"inputs": {"user_request": user_request},
-                            "outputs": {"result": response.content}})
+        chat_history.append({"inputs": {"question": question},
+                            "outputs": {"answer": response.content}})
+
         if requires_user_confirmation(response.content):
-            return dict(result=response.content)
+            return dict(answer=response.content, messages=messages)
         else:
             tasks = json.loads(extract_json_code_block(response.content))
-    except json.JSONDecodeError:
-        return dict(result="Error parsing task scheduling response.")
+    except json.JSONDecodeError as e:
+        print(f"Error parsing task scheduling response: {e}")
+        return dict(answer="Error parsing task scheduling response", messages=messages)
 
     multi_task = AsyncMultiTask(tasks)
     await task_manager.schedule_task(multi_task)
     await orchestrator.wait_for_all_tasks()
     await conversation_thread_client.close()
 
-    return dict(result=messages)
+    return dict(answer=messages[-1], messages=messages)
 
 
 if __name__ == "__main__":
     from promptflow.tracing import start_trace
     start_trace()
 
-    result = asyncio.run(run_multi_agents(chat_history = [], user_request="Please create basic CLI application about chat between user and assistant using java programming language"))
+    result = asyncio.run(run_multi_agents(chat_history = [], question="Please create basic CLI application about chat between user and assistant using java programming language"))
     print(result)

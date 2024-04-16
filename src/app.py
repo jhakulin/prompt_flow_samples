@@ -27,11 +27,12 @@ def start_chat():
 
     promptflows = [
         os.path.join(os.path.dirname(__file__), 'functions_flow'),
-        os.path.join(os.path.dirname(__file__), 'autogen_flow')
+        os.path.join(os.path.dirname(__file__), 'autogen_flow'),
+        os.path.join(os.path.dirname(__file__), 'multi_agent_flow'),
     ]
 
     config = dict(
-        active_promptflow = promptflows[0],
+        active_promptflow = promptflows[2],
         promptflows = promptflows,
     )
     cl.user_session.set("config", config)
@@ -100,14 +101,16 @@ async def run_conversation(message: cl.Message):
         response = await call_promptflow(chat_history, message)
 
         if "messages" in response:
-            for thing in response["messages"]:
-                async with cl.Step(name=thing["role"]) as child_step:
-                    child_step.output = thing["content"]
+            for item in response["messages"]:
+                # Here, 'message' is a dictionary with 'assistant_name' and 'message_content'
+                async with cl.Step(name=item["assistant_name"]) as child_step:
+                    # Set the output of the step to the content of the message
+                    child_step.output = item["message_content"]
 
-        if response["image"]:
-            elements = show_images(response["image"])
-        else:
-            elements = []  
+        #if response["image"]:
+        #    elements = show_images(response["image"])
+        #else:
+        elements = []
 
         await cl.Message(content=response["answer"], 
                             author="Answer",
@@ -118,7 +121,7 @@ async def run_conversation(message: cl.Message):
 
 if __name__ == "__main__":
 
-    print("using the follwoing chat_model", os.getenv("OPENAI_CHAT_MODEL"))
+    print("using the following chat_model", os.getenv("OPENAI_CHAT_MODEL"))
 
     from chainlit.cli import run_chainlit
     run_chainlit(__file__)
