@@ -107,10 +107,10 @@ async def run_conversation(message: cl.Message):
                     # Set the output of the step to the content of the message
                     child_step.output = item["message_content"]
 
-        #if response["image"]:
-        #    elements = show_images(response["image"])
-        #else:
-        elements = []
+        if "image" in response:
+            elements = show_images(response["image"])
+        else:
+            elements = []
 
         await cl.Message(content=response["answer"], 
                             author="Answer",

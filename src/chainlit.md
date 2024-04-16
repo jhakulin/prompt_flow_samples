@@ -1,63 +1,35 @@
-# Image and Weather chat
+# Multi-Agent Code Task Orchestration Sample
 
-Hi, this is a chat client to play around with functions to understand how they work in OpenAI.
+This sample demonstrates how to orchestrate multi-agent task execution using a conversation thread-based communication
+between 2 agents for code programming and inspection and task planner agent working with user to create a plan
+for the required SW coding tasks.
 
-This chat has 2 functions configured:
-1. A function to get the current weather in a given location
-2. A function that creates a picture based on a description given by the user
+## Prerequisites
 
-Try simple queries like:
-- what is the weather like in beijing?
-- paint me a picture of a deer in a hoodie.
+Install `azure_ai_assistant-0.2.12a1-py3-none-any.whl` library from https://github.com/Azure-Samples/azureai-assistant-tool/releases/tag/v0.2.12-alpha.
 
-Then try more complex queries like:
-- paint a picture of the current weather conditions as they present themselves at this time in Hamburg
+## Configure the sample
 
+Sample consists of following agents and their roles:
+- TaskPlannerAgent
+  - Creates plan (tasks) using users input and knowledge about CodeProgrammerAgent and CodeInspectionAgent assistant instances to achieve the required SW engineering work.
+  - Uses own conversation thread with user
+- CodeProgrammerAgent
+  - Configured to handle SW programming related tasks
+  - Uses functions to access files for reading and writing
+  - Uses shared conversation thread with CodeInspectionAgent
+- CodeInspectionAgent
+  - Configured to handle SW inspection related tasks
+  - Uses functions to access files for reading
+  - Uses shared conversation thread with CodeProgrammerAgent
+- FileCreatorAgent
+  - Configured to take CodeProgrammerAgent output as input and write code block contents to a file
 
-And inspect the traces at `http://localhost:<your-port>/v1.0/ui/traces/#`
+### Configure the Agents
 
-
-### Function details:
-```json
-[
-    {
-        "type": "function",
-        "function": {
-            "name": "get_current_weather",
-            "description": "Get the current weather in a given location",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "location": {
-                        "type": "string",
-                        "description": "The city and state or city and country, e.g. San Francisco, CA or Tokyo, Japan",
-                    }
-                },
-                "required": ["location"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "create_a_picture",
-            "description": """
-            Creates a picture based on a description given by the user. 
-            The function will return the base64 encoded picture and that picture will be shown next to the response provided to the user.
-            So, don't put a link to the picture in the response, as the picture will be shown automatically.
-            """,
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "prompt": {
-                        "type": "string",
-                        "description": "The description of what the picture should be, for instance 'a drawing of a cat' or 'a phtograph of a room with a table and a chair' ",
-                    }
-                },
-                "required": ["prompt"],
-            },
-        },
-    }
-]
-```
+TaskPlannerAgent get the details about CodeProgrammerAgent and CodeInspectionAgent by file references in the yaml configuration.
+NOTE: Check the file references paths are configured correctly for your environment, the file_references field in yaml config files 
+require absolute path.
+- IMPORTANT: If you are not seeing `CodeProgrammerAgent` or `CodeInspectionAgent` in the task list assistant provided, then it means your file
+references are not correct in TaskPlannerAgent yaml configuration.
 
